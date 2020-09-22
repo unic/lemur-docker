@@ -13,7 +13,6 @@ services:
       - redis:redis
     volumes:
       - /usr/local/src/lemur/lemur/static/dist
-      - ./data/lemur.conf.py:/usr/local/src/lemur/lemur.conf.py
     environment:
       DEBUG: 'False'
       LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py
@@ -56,8 +55,6 @@ services:
     links:
       - postgres:postgres
       - redis:redis
-    volumes:
-      - ./data/lemur.conf.py:/usr/local/src/lemur/lemur.conf.py
     environment:
       DEBUG: 'False'
       LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py
@@ -72,8 +69,6 @@ services:
     links:
       - postgres:postgres
       - redis:redis
-    volumes:
-      - ./data/lemur.conf.py:/usr/local/src/lemur/lemur.conf.py
     environment:
       DEBUG: 'False'
       LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py
