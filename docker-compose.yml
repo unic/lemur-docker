@@ -13,6 +13,7 @@ services:
       - redis:redis
     volumes:
       - /usr/local/src/lemur/lemur/static/dist
+      - ./data/lemur.conf.py:/usr/local/src/lemur/lemur.conf.py
     environment:
       DEBUG: 'False'
       LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py
@@ -50,11 +51,11 @@ services:
     build:
       context: ./web
       target: celery-beat
-    expose:
-      - "8000"
     links:
       - postgres:postgres
       - redis:redis
+    volumes:
+      - ./data/lemur.conf.py:/usr/local/src/lemur/lemur.conf.py
     environment:
       DEBUG: 'False'
       LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py
@@ -64,11 +65,11 @@ services:
     build:
       context: ./web
       target: celery-worker
-    expose:
-      - "8000"
     links:
       - postgres:postgres
       - redis:redis
+    volumes:
+      - ./data/lemur.conf.py:/usr/local/src/lemur/lemur.conf.py
     environment:
       DEBUG: 'False'
       LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py
