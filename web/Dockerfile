@@ -83,7 +83,7 @@ CMD ["/usr/local/src/lemur/scripts/beat-start.sh"]
 FROM lemur AS celery-worker
 
 ADD lemur.conf.py /usr/local/src/lemur/lemur.conf.py
-ADD beat-start.sh /usr/local/src/lemur/scripts/worker-start.sh
+ADD worker-start.sh /usr/local/src/lemur/scripts/worker-start.sh
 RUN chmod +x /usr/local/src/lemur/scripts/worker-start.sh
 
 CMD ["/usr/local/src/lemur/scripts/worker-start.sh"]
