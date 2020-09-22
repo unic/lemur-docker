@@ -75,6 +75,9 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://lemur:lemur@postgres:5432/lemur'
 # VERISIGN_LAST_NAME = ''
 # VERSIGN_EMAIL = ''
 
+REDIS_HOST="redis"
+REDIS_PORT="6379"
+
 CELERY_RESULT_BACKEND = 'redis://redis:6379'
 CELERY_BROKER_URL = 'redis://redis:6379'
 CELERY_IMPORTS = ('lemur.common.celery')
