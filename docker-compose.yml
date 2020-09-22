@@ -1,33 +1,79 @@
-lemur-web:
-  restart: always
-  build: ./web
-  expose:
-    - "8000"
-  links:
-    - postgres:postgres
-  volumes:
-    - /usr/local/src/lemur/lemur/static/dist
-  environment:
-    DEBUG: 'False'
-    LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py
-lemur-nginx:
-  restart: always
-  build: ./nginx/
-  ports:
-    - "80:80"
-    - "443:443"
-  volumes_from:
-    - lemur-web
-  links:
-    - lemur-web
-    - lemur-web:web
+---
+version: '3.4'
+services:
+  lemur-web:
+    restart: always
+    build:
+      context: ./web
+      target: web
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+      - redis:redis
+    volumes:
+      - /usr/local/src/lemur/lemur/static/dist
+      - ./data/lemur.conf.py:/usr/local/src/lemur/lemur.conf.py
+    environment:
+      DEBUG: 'False'
+      LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py
 
-postgres:
-  restart: always
-  image: postgres:latest
-  ports:
-    - "5432:5432"
-  environment:
-    POSTGRES_USER: lemur
-    POSTGRES_PASSWORD: lemur
-    POSTGRES_DB: lemur
+  lemur-nginx:
+    restart: always
+    build: ./nginx/
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes_from:
+      - lemur-web
+    links:
+      - lemur-web
+      - lemur-web:web
+
+  postgres:
+    restart: always
+    image: postgres:alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: lemur
+      POSTGRES_PASSWORD: lemur
+      POSTGRES_DB: lemur
+
+  redis:
+    restart: always
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  lemur-celery-beat:
+    restart: always
+    build:
+      context: ./web
+      target: celery-beat
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+      - redis:redis
+    volumes:
+      - ./data/lemur.conf.py:/usr/local/src/lemur/lemur.conf.py
+    environment:
+      DEBUG: 'False'
+      LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py
+
+  lemur-celery-worker:
+    restart: always
+    build:
+      context: ./web
+      target: celery-worker
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+      - redis:redis
+    volumes:
+      - ./data/lemur.conf.py:/usr/local/src/lemur/lemur.conf.py
+    environment:
+      DEBUG: 'False'
+      LEMUR_CONF: /usr/local/src/lemur/lemur.conf.py

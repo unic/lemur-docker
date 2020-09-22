@@ -26,7 +26,6 @@ echo "Waiting for db to become available"
 wait_db
 [ "x$?" == "x0" ] && printf "db ready!\n\n" || db_not_ready
 
-
 cd /usr/local/src/lemur/lemur
 
 export PATH=/usr/local/src/lemur/venv/bin:${PATH}

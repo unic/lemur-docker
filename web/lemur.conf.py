@@ -3,6 +3,7 @@
 
 import os
 _basedir = os.path.abspath(os.path.dirname(__file__))
+from celery.schedules import crontab
 
 ADMINS = frozenset([''])
 
@@ -73,3 +74,46 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://lemur:lemur@postgres:5432/lemur'
 # VERISIGN_FIRST_NAME = ''
 # VERISIGN_LAST_NAME = ''
 # VERSIGN_EMAIL = ''
+
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_IMPORTS = ('lemur.common.celery')
+CELERY_TIMEZONE = 'UTC'
+
+CELERYBEAT_SCHEDULE = {
+    'fetch_all_pending_acme_certs': {
+        'task': 'lemur.common.celery.fetch_all_pending_acme_certs',
+        'options': {
+            'expires': 180
+        },
+        'schedule': crontab(minute="*"),
+    },
+    'remove_old_acme_certs': {
+        'task': 'lemur.common.celery.remove_old_acme_certs',
+        'options': {
+            'expires': 180
+        },
+        'schedule': crontab(hour=7, minute=30, day_of_week=1),
+    },
+    'clean_all_sources': {
+        'task': 'lemur.common.celery.clean_all_sources',
+        'options': {
+            'expires': 180
+        },
+        'schedule': crontab(hour=1, minute=0, day_of_week=1),
+    },
+    'sync_all_sources': {
+        'task': 'lemur.common.celery.sync_all_sources',
+        'options': {
+            'expires': 180
+        },
+        'schedule': crontab(hour="*/3", minute=5),
+    },
+    'sync_source_destination': {
+        'task': 'lemur.common.celery.sync_source_destination',
+        'options': {
+            'expires': 180
+        },
+        'schedule': crontab(hour="*"),
+    }
+}

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM ubuntu:18.04
+FROM ubuntu:18.04 AS base
 LABEL maintainer="Netflix Open Source Development <talent@netflix.com>"
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -36,6 +36,10 @@ RUN locale-gen en_US.UTF-8
 
 ENV LC_ALL=en_US.UTF-8
 
+
+# Build lemur, this can be used for celery
+FROM base AS lemur
+
 ENV LEMUR_VERSION=master LEMUR_TARGET=develop
 
 # Install Lemur
@@ -52,6 +56,9 @@ RUN git config --global url."https://".insteadOf git:// &&\
 
 WORKDIR /usr/local/src/lemur
 
+# Build web, this is needed to run the application and deliver all the nodejs stuff
+FROM lemur AS web
+
 # Create static files
 RUN npm install --unsafe-perm && node_modules/.bin/gulp build && \
   node_modules/.bin/gulp package && \
@@ -62,3 +69,21 @@ ADD api-start.sh /usr/local/src/lemur/scripts/api-start.sh
 RUN chmod +x /usr/local/src/lemur/scripts/api-start.sh
 
 CMD ["/usr/local/src/lemur/scripts/api-start.sh"]
+
+# Build web, this is needed to run the application and deliver all the nodejs stuff
+FROM lemur AS celery-beat
+
+ADD lemur.conf.py /usr/local/src/lemur/lemur.conf.py
+ADD beat-start.sh /usr/local/src/lemur/scripts/beat-start.sh
+RUN chmod +x /usr/local/src/lemur/scripts/beat-start.sh
+
+CMD ["/usr/local/src/lemur/scripts/beat-start.sh"]
+
+# Build web, this is needed to run the application and deliver all the nodejs stuff
+FROM lemur AS celery-worker
+
+ADD lemur.conf.py /usr/local/src/lemur/lemur.conf.py
+ADD beat-start.sh /usr/local/src/lemur/scripts/worker-start.sh
+RUN chmod +x /usr/local/src/lemur/scripts/worker-start.sh
+
+CMD ["/usr/local/src/lemur/scripts/worker-start.sh"]
