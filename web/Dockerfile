@@ -64,8 +64,7 @@ RUN npm install --unsafe-perm && node_modules/.bin/gulp build && \
   node_modules/.bin/gulp package && \
   rm -r bower_components node_modules
 
-ADD lemur.conf.py /usr/local/src/lemur/lemur.conf.py
-ADD api-start.sh /usr/local/src/lemur/scripts/api-start.sh
+ADD web/api-start.sh /usr/local/src/lemur/scripts/api-start.sh
 RUN chmod +x /usr/local/src/lemur/scripts/api-start.sh
 
 CMD ["/usr/local/src/lemur/scripts/api-start.sh"]
@@ -73,8 +72,7 @@ CMD ["/usr/local/src/lemur/scripts/api-start.sh"]
 # Build web, this is needed to run the application and deliver all the nodejs stuff
 FROM lemur AS celery-beat
 
-ADD lemur.conf.py /usr/local/src/lemur/lemur.conf.py
-ADD beat-start.sh /usr/local/src/lemur/scripts/beat-start.sh
+ADD web/beat-start.sh /usr/local/src/lemur/scripts/beat-start.sh
 RUN chmod +x /usr/local/src/lemur/scripts/beat-start.sh
 
 CMD ["/usr/local/src/lemur/scripts/beat-start.sh"]
@@ -82,8 +80,7 @@ CMD ["/usr/local/src/lemur/scripts/beat-start.sh"]
 # Build web, this is needed to run the application and deliver all the nodejs stuff
 FROM lemur AS celery-worker
 
-ADD lemur.conf.py /usr/local/src/lemur/lemur.conf.py
-ADD worker-start.sh /usr/local/src/lemur/scripts/worker-start.sh
+ADD web/worker-start.sh /usr/local/src/lemur/scripts/worker-start.sh
 RUN chmod +x /usr/local/src/lemur/scripts/worker-start.sh
 
 CMD ["/usr/local/src/lemur/scripts/worker-start.sh"]
