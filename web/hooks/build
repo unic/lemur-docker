@@ -1,3 +1,5 @@
 #! /bin/bash
-echo "Building branch ${LEMUR_VERSION:-master} and target ${LEMUR_TARGET:-develop}, for image $TARGET"
-docker build --build-arg LEMUR_VERSION=${LEMUR_VERSION:-master} --build-arg LEMUR_TARGET=${LEMUR_TARGET:-develop} -t $IMAGE_NAME --target $TARGET .
+echo "Building branch ${LEMUR_VERSION:=master} from repo ${LEMUR_REPO:=netflix/lemur} with make ${LEMUR_TARGET:=develop}, for image $TARGET"
+# shellcheck disable=SC2086
+# SC2086 doesn't properly handle the default values
+docker build --build-arg LEMUR_VERSION=${LEMUR_VERSION:-master} --build-arg LEMUR_TARGET=${LEMUR_TARGET:-develop} --build-arg LEMUR_REPO=${LEMUR_REPO:-netflix/lemur} -t $IMAGE_NAME --target $TARGET .

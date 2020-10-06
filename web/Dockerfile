@@ -42,12 +42,13 @@ FROM base AS lemur
 
 ARG LEMUR_VERSION=master
 ARG LEMUR_TARGET=develop
-ENV ENV_LEMUR_VERSION=$LEMUR_VERSION ENV_LEMUR_TARGET=$LEMUR_TARGET
+ARG LEMUR_REPO=netflix/lemur
+ENV ENV_LEMUR_VERSION=$LEMUR_VERSION ENV_LEMUR_TARGET=$LEMUR_TARGET ENV_LEMUR_REPO=$LEMUR_REPO
 
 # Install Lemur
 RUN git config --global url."https://".insteadOf git:// &&\
   cd /usr/local/src &&\
-  git clone https://github.com/netflix/lemur.git &&\
+  git clone https://github.com/${ENV_LEMUR_REPO}.git &&\
   cd lemur &&\
   git checkout ${ENV_LEMUR_VERSION} &&\
   pip install --upgrade pip virtualenv &&\
