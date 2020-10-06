@@ -1,2 +1,3 @@
 #! /bin/bash
-docker build -t $IMAGE_NAME --target $TARGET .
+echo "Building branch ${LEMUR_VERSION:-master} and target ${LEMUR_TARGET:-develop}, for image $TARGET"
+docker build --build-arg LEMUR_VERSION=${LEMUR_VERSION:-master} --build-arg LEMUR_TARGET=${LEMUR_TARGET:-develop} -t $IMAGE_NAME --target $TARGET .

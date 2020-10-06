@@ -40,19 +40,21 @@ ENV LC_ALL=en_US.UTF-8
 # Build lemur, this can be used for celery
 FROM base AS lemur
 
-ENV LEMUR_VERSION=master LEMUR_TARGET=develop
+ARG LEMUR_VERSION=master
+ARG LEMUR_TARGET=develop
+ENV ENV_LEMUR_VERSION=$LEMUR_VERSION ENV_LEMUR_TARGET=$LEMUR_TARGET
 
 # Install Lemur
 RUN git config --global url."https://".insteadOf git:// &&\
   cd /usr/local/src &&\
   git clone https://github.com/netflix/lemur.git &&\
   cd lemur &&\
-  git checkout ${LEMUR_VERSION} &&\
+  git checkout ${ENV_LEMUR_VERSION} &&\
   pip install --upgrade pip virtualenv &&\
   export PATH=/usr/local/src/lemur/venv/bin:${PATH} &&\
   virtualenv -p python3 venv &&\
   . venv/bin/activate &&\
-  make ${LEMUR_TARGET}
+  make ${ENV_LEMUR_TARGET}
 
 WORKDIR /usr/local/src/lemur
 
@@ -64,7 +66,7 @@ RUN npm install --unsafe-perm && node_modules/.bin/gulp build && \
   node_modules/.bin/gulp package && \
   rm -r bower_components node_modules
 
-ADD web/api-start.sh /usr/local/src/lemur/scripts/api-start.sh
+ADD api-start.sh /usr/local/src/lemur/scripts/api-start.sh
 RUN chmod +x /usr/local/src/lemur/scripts/api-start.sh
 
 CMD ["/usr/local/src/lemur/scripts/api-start.sh"]
@@ -72,7 +74,7 @@ CMD ["/usr/local/src/lemur/scripts/api-start.sh"]
 # Build web, this is needed to run the application and deliver all the nodejs stuff
 FROM lemur AS celery-beat
 
-ADD web/beat-start.sh /usr/local/src/lemur/scripts/beat-start.sh
+ADD beat-start.sh /usr/local/src/lemur/scripts/beat-start.sh
 RUN chmod +x /usr/local/src/lemur/scripts/beat-start.sh
 
 CMD ["/usr/local/src/lemur/scripts/beat-start.sh"]
@@ -80,7 +82,7 @@ CMD ["/usr/local/src/lemur/scripts/beat-start.sh"]
 # Build web, this is needed to run the application and deliver all the nodejs stuff
 FROM lemur AS celery-worker
 
-ADD web/worker-start.sh /usr/local/src/lemur/scripts/worker-start.sh
+ADD worker-start.sh /usr/local/src/lemur/scripts/worker-start.sh
 RUN chmod +x /usr/local/src/lemur/scripts/worker-start.sh
 
 CMD ["/usr/local/src/lemur/scripts/worker-start.sh"]
