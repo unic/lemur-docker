@@ -1,2 +1,5 @@
 #! /bin/bash
+echo $(pwd)
+echo "docker build -f $DOCKERFILE_PATH -t $IMAGE_NAME --target $TARGET ."
+
 docker build -f $DOCKERFILE_PATH -t $IMAGE_NAME --target $TARGET .
