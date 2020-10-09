@@ -17,7 +17,7 @@ db_not_ready() {
 wait_db() {
     for i in $(seq 1 10); do
         echo -e "\033[1mAttempt to connect to db.. try #$i\033[0m"
-        sudo -u postgres PGPASSWORD=lemur psql -U lemur -h postgres --command 'select 1;' && return 0
+        sudo -u postgres PGPASSWORD=$DB_PASSWORD psql -U $DB_USER -h $DB_HOST --command 'select 1;' && return 0
         sleep $SLEEP
     done
     return 1
