@@ -40,8 +40,7 @@ ARG LEMUR_REPO=netflix/lemur
 ENV ENV_LEMUR_VERSION=$LEMUR_VERSION ENV_LEMUR_TARGET=$LEMUR_TARGET ENV_LEMUR_REPO=$LEMUR_REPO
 
 # Install Lemur
-RUN echo "Building branch ${LEMUR_VERSION} from repo ${LEMUR_REPO} with make ${LEMUR_TARGET}" && \
-  git config --global url."https://".insteadOf git:// &&\
+RUN git config --global url."https://".insteadOf git:// &&\
   cd /usr/local/src &&\
   git clone https://github.com/${ENV_LEMUR_REPO}.git &&\
   cd lemur &&\
@@ -55,10 +54,11 @@ RUN echo "Building branch ${LEMUR_VERSION} from repo ${LEMUR_REPO} with make ${L
 # Cleanup lemur installation
 RUN rm -rf /usr/local/src/lemur.git && \
   rm -rf /usr/local/src/lemur/node_modules && \
-  rm -rf /usr/local/src/lemur/bower_components
+  rm -rf /usr/local/src/lemur/bower_components && \
+  rm -rf /usr/local/src/lemur/lemur/static
 
 # Build web, this is needed to run the application and deliver all the nodejs stuff
-FROM python:3.6-slim AS web
+FROM python:3.6-slim AS celery-beat
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
@@ -66,13 +66,14 @@ RUN apt update && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY --from=build --chown=1000:1000 /usr/local/src/lemur /usr/local/src/lemur/
-COPY --chown=1000:1000 api-start.sh /usr/local/src/lemur/scripts/api-start.sh
-RUN chmod 0764 /usr/local/src/lemur/scripts/api-start.sh
+COPY --from=build --chown=1000:1000 /usr/local/src/lemur /usr/local/src/lemur
+
+COPY --chown=1000:1000 beat-start.sh /usr/local/src/lemur/scripts/beat-start.sh
+RUN chmod 0764 /usr/local/src/lemur/scripts/beat-start.sh
 
 USER 1000:1000
 ENV PATH="/usr/local/src/lemur/venv/bin:${PATH}"
 
-WORKDIR /usr/local/src/lemur/lemur/
+WORKDIR /usr/local/src/lemur/
 
-CMD ["/usr/local/src/lemur/scripts/api-start.sh"]
+CMD ["/usr/local/src/lemur/scripts/beat-start.sh"]
