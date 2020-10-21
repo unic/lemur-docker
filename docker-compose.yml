@@ -49,8 +49,8 @@ services:
   lemur-celery-beat:
     restart: always
     build:
-      context: ./web
-      target: celery-beat
+      context: ./celery
+      dockerfile: Dockerfile-beat
     links:
       - postgres:postgres
       - redis:redis
@@ -63,8 +63,8 @@ services:
   lemur-celery-worker:
     restart: always
     build:
-      context: ./web
-      target: celery-worker
+      context: ./celery
+      dockerfile: Dockerfile-worker
     links:
       - postgres:postgres
       - redis:redis
