@@ -59,7 +59,7 @@ FROM python:3.6-slim AS celery-worker
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
-    apt install -y libldap-2.4-2 slapd &&\
+    apt install -y libldap-2.4-2 slapd libpq5 &&\
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
