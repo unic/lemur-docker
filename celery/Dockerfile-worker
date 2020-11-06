@@ -59,9 +59,10 @@ FROM python:3.6-slim AS celery-worker
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
-    apt install -y libldap-2.4-2 slapd libpq5 &&\
+    apt install -y libldap-2.4-2 slapd libpq5 && \
     apt-get clean -y && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    useradd celery
 
 COPY --from=build --chown=1000:1000 /usr/local/src/lemur /usr/local/src/lemur
 COPY --chown=1000:1000 worker-start.sh /usr/local/src/lemur/scripts/worker-start.sh
